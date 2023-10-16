@@ -15,15 +15,17 @@ message(STATUS "  version: ${SFML_VERSION}")
 message(STATUS "  include: ${SFML_INCLUDE_DIR}")
 
 include_directories(
-	"D:/Lib/SFML-2.6.0/include"
+	D:/Lib/SFML-2.6.0/include
+    include
 )
+
 get_directory_property(dirs INCLUDE_DIRECTORIES)
 foreach(dir ${dirs})
     message("Include Directory: ${dir}")
 endforeach()
 # WIN32
 if(WIN32)
-    add_executable(CMakeSFMLProject  src/main.cpp)
+    add_executable(CMakeSFMLProject  src/main.cpp  src/button.cpp)
 else()
     add_executable(CMakeSFMLProject src/main.cpp)
 endif()

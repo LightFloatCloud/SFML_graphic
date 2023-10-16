@@ -3,27 +3,124 @@
 #include <random>
 #include <stdlib.h>
 
+#include "button.h"
+
 //sf::RenderWindow window(sf::VideoMode(800, 600), "myproject");
+
+int width = 800, height = 600;
+
+void paint_draw(sf::RenderWindow &window) 
+{
+    // 纹理部分
+    sf::Texture texture;
+    if (!texture.loadFromFile("./resourse/wood1.jpg",  sf::IntRect(0, 0, 800, 600)))
+    {
+        // error...
+        std::cout << "ERRER OCCURED! --loadFromFile: Texture" << std::endl;
+    }
+    texture.setSmooth(true);
+    texture.setRepeated(true);
+
+    sf::Sprite sprite;
+    sprite.setTexture(texture);
+    //sprite.setTextureRect(sf::IntRect(10, 10, 32, 32));
+    //sprite.setColor(sf::Color(0, 255, 0)); // green
+    //sprite.setColor(sf::Color(255, 255, 255, 128)); // half transparent
+
+    // // position
+    // sprite.setPosition(sf::Vector2f(10.f, 50.f)); // absolute position
+    // sprite.move(sf::Vector2f(5.f, 10.f)); // offset relative to the current position
+
+    // // rotation
+    // sprite.setRotation(90.f); // absolute angle
+    // sprite.rotate(15.f); // offset relative to the current angle
+
+    // // scale
+    // sprite.setScale(sf::Vector2f(0.5f, 2.f)); // absolute scale factor
+    // sprite.scale(sf::Vector2f(1.5f, 3.f)); // factor relative to the current scale
+    window.draw(sprite);
+
+    // 形状
+    float radius = 50.f;
+    sf::CircleShape circle(radius);
+    circle.setFillColor(sf::Color::Cyan);
+    //circle.setFillColor(sf::Color(255, 0, 0));
+    circle.setOutlineThickness(10.f);
+    circle.setOutlineColor(sf::Color(250, 150, 100));
+    
+    circle.setOrigin(sf::Vector2f(radius, radius));
+    circle.setPosition(sf::Vector2f(width/2, height/2));
+    window.draw(circle);
+
+
+
+    // 字体
+    sf::Font font;
+    if (!font.loadFromFile("./resourse/simhei.ttf"))
+    {
+        // error...
+        std::cout << "ERRER OCCURED! --loadFromFile: Font" << std::endl;
+    }
+
+    sf::Text text;
+    text.setFont(font); 
+    text.setString(L"国际五子棋");
+    text.setCharacterSize(48); 
+    text.setFillColor(sf::Color::Black);
+    text.setStyle(sf::Text::Bold);
+    text.setLetterSpacing(4.0f);
+    //std::cout<< text.findCharacterPos(2).x << " " << text.findCharacterPos(2).y <<std::endl;
+    text.setOrigin(text.findCharacterPos(2) + sf::Vector2f(24.f,24.f));
+    text.setPosition(sf::Vector2f(width/2, height/4));
+    window.draw(text);
+
+
+
+
+
+
+
+}
+
+
+
+
 
 int main()
 {
-    //auto window = sf::RenderWindow{ { 1920u, 1080u }, "CMake SFML Project" };
-    //sf::Window window(sf::VideoMode(800, 600), "myproject");
     system("chcp 65001");
     
-    int width = 800, height = 600;
+    
     const wchar_t* title = L"中文标题 SFML程序";
 
-
+    uint8_t win_state = 0;
 
 
     sf::RenderWindow window(sf::VideoMode(width, height), title);
-    window.setFramerateLimit(2);
+    window.setFramerateLimit(10);
     window.setKeyRepeatEnabled(false);
     
     sf::Clock clock; // starts the clock
+
+    Button bt_start(window);
+    bt_start.type = Button::Shape_type;
+    bt_start.setShapeSize(220.f, 60.f);//大小
+    bt_start.setPosition(400, 440);//位置
+    bt_start.rectangle.setFillColor(sf::Color(100,150,25));
+    bt_start.isActive = true;
+
     while (window.isOpen())
     {
+        window.clear(sf::Color(0, 0, 0, 0));
+        paint_draw(window);  // 画背景
+
+
+        
+
+        
+
+
+
         for (auto event = sf::Event{}; window.pollEvent(event);)
         {
             
@@ -32,24 +129,6 @@ int main()
                 // window closed
                 case sf::Event::Closed:
                     window.close();
-                    break;
-
-                // we don't process other types of events
-                case sf::Event::Resized:
-                    std::cout << "new width: " << event.size.width << std::endl;
-                    std::cout << "new height: " << event.size.height << std::endl;
-                    break;
-
-                case sf::Event::LostFocus:
-                    std::cout << "Lose Focus!" << std::endl;
-                    break;
-                case sf::Event::GainedFocus:
-                    std::cout << "Gained Focus!" << std::endl;
-                    break;
-
-                case sf::Event::TextEntered:
-                    if (event.text.unicode < 128)
-                        std::cout << "ASCII character typed: " << static_cast<char>(event.text.unicode) << std::endl;
                     break;
 
                 case sf::Event::KeyPressed:
@@ -71,18 +150,6 @@ int main()
                     }
                     break;
                 
-                case sf::Event::MouseWheelScrolled:
-                    if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
-                        std::cout << "wheel type: vertical" << std::endl;
-                    else if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel)
-                        std::cout << "wheel type: horizontal" << std::endl;
-                    else
-                        std::cout << "wheel type: unknown" << std::endl;
-                    std::cout << "wheel movement: " << event.mouseWheelScroll.delta << std::endl;
-                    std::cout << "mouse x: " << event.mouseWheelScroll.x << std::endl;
-                    std::cout << "mouse y: " << event.mouseWheelScroll.y << std::endl;
-                    break;
-
                 case sf::Event::MouseButtonPressed:
                     if (event.mouseButton.button == sf::Mouse::Right)
                     {
@@ -90,11 +157,16 @@ int main()
                         std::cout << "mouse x: " << event.mouseButton.x << std::endl;
                         std::cout << "mouse y: " << event.mouseButton.y << std::endl;
                     }
+                    else if(event.mouseButton.button == sf::Mouse::Left) {
+                    //    if (event.mouseButton.x <)
+                    }
                     break;
 
                 default:
                     break;
             }
+
+            bt_start.onClick(event); // 配置按钮
         }
         
         // 时间部分
@@ -103,78 +175,27 @@ int main()
         //clock.restart();
 
 
-        // std::random_device rd;  // 随机设备，用于获取种子
-        // std::mt19937 gen(rd());  // Mersenne Twister 伪随机数生成器
-        // std::uniform_int_distribution<int> distribution(0, 1000);  // 定义随机数分布
-
-        // int random_x = distribution(gen);  // 生成随机整数
-        // int random_y = distribution(gen);  // 生成随机整数
-        // std::cout << "随机整数: " << random_x << " " << random_y << std::endl;
-        // window.setPosition(sf::Vector2i(random_x, random_y));
         
-        window.clear(sf::Color(0, 0, 0, 0));
-
-        // 纹理部分
-        sf::Texture texture;
-        if (!texture.loadFromFile("./resourse/wood1.jpg",  sf::IntRect(0, 0, 800, 600)))
-        {
-            // error...
-            std::cout << "ERRER OCCURED! --loadFromFile: Texture" << std::endl;
-        }
-        texture.setSmooth(true);
-        texture.setRepeated(true);
-
-        sf::Sprite sprite;
-        sprite.setTexture(texture);
-        //sprite.setTextureRect(sf::IntRect(10, 10, 32, 32));
-        //sprite.setColor(sf::Color(0, 255, 0)); // green
-        //sprite.setColor(sf::Color(255, 255, 255, 128)); // half transparent
-
-        // // position
-        // sprite.setPosition(sf::Vector2f(10.f, 50.f)); // absolute position
-        // sprite.move(sf::Vector2f(5.f, 10.f)); // offset relative to the current position
-
-        // // rotation
-        // sprite.setRotation(90.f); // absolute angle
-        // sprite.rotate(15.f); // offset relative to the current angle
-
-        // // scale
-        // sprite.setScale(sf::Vector2f(0.5f, 2.f)); // absolute scale factor
-        // sprite.scale(sf::Vector2f(1.5f, 3.f)); // factor relative to the current scale
-        window.draw(sprite);
-
-        // 形状
-        float radius = 50.f;
-        sf::CircleShape circle(radius);
-        circle.setFillColor(sf::Color::Cyan);
-        //circle.setFillColor(sf::Color(255, 0, 0));
-        circle.setOutlineThickness(10.f);
-        circle.setOutlineColor(sf::Color(250, 150, 100));
         
-        circle.setOrigin(sf::Vector2f(radius, radius));
-        circle.setPosition(sf::Vector2f(width/2, height/2));
-        window.draw(circle);
 
 
 
-        // 字体
-        sf::Font font;
-        if (!font.loadFromFile("./resourse/simhei.ttf"))
+        switch (win_state)
         {
-            // error...
-            std::cout << "ERRER OCCURED! --loadFromFile: Font" << std::endl;
+            Event e;
+        case 0:
+            
+            bt_start.draw(); // 画按钮
+            
+
+            break;
+        
+        default:
+            break;
         }
 
-        sf::Text text;
-        text.setFont(font); 
-        text.setString(L"国 际 五 子 棋");
-        text.setCharacterSize(48); 
-        text.setFillColor(sf::Color::Black);
-        text.setStyle(sf::Text::Bold);
-        window.draw(text);
-
+        
     
-
         window.display();
     }
 }
