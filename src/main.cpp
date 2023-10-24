@@ -282,16 +282,16 @@ int main()
     bt_start.isActive = true;
 
 // 贴图初始化
-    if (!texture.loadFromFile("./resourse/wood2.jpg",  sf::IntRect(0, 0, 800, 600))) {
+    if (!texture.loadFromFile("./../resourse/wood2.jpg",  sf::IntRect(0, 0, 800, 600))) {
         // error...
         std::cout << "ERRER OCCURED! --loadFromFile: Texture" << std::endl;
     }
-    if (!qizi.loadFromFile("./resourse/qizi.png")) {
+    if (!qizi.loadFromFile("./../resourse/qizi.png")) {
         // error...
         std::cout << "ERRER OCCURED! --loadFromFile: Qizi" << std::endl;
     }
     // 字体
-    if (!font.loadFromFile("./resourse/simhei.ttf"))
+    if (!font.loadFromFile("./../resourse/simhei.ttf"))
     {
         // error...
         std::cout << "ERRER OCCURED! --loadFromFile: Font" << std::endl;
